@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ApiPromise } from '@polkadot/api'
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+import { useMultiChain } from '../hooks/useMultiChain'
 import './PortfolioView.css'
 
 interface PortfolioViewProps {
@@ -14,66 +15,67 @@ interface BalanceInfo {
   reserved: string
   total: string
   chain: string
+  token: string
 }
 
 export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
+  const { chainApis, isInitializing, getBalance } = useMultiChain()
   const [balances, setBalances] = useState<BalanceInfo[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [totalValue, setTotalValue] = useState<string>('0')
+  const [chainStats, setChainStats] = useState<Map<string, { count: number; total: string }>>(new Map())
 
   useEffect(() => {
-    if (api && accounts.length > 0) {
+    if (!isInitializing && accounts.length > 0) {
       loadBalances()
     }
-  }, [api, accounts])
+  }, [isInitializing, accounts, chainApis])
 
   const loadBalances = async () => {
-    if (!api || accounts.length === 0) return
+    if (accounts.length === 0) return
 
     try {
       setIsLoading(true)
-      console.log('Loading balances for', accounts.length, 'accounts')
+      console.log('Loading balances from', chainApis.length, 'chains for', accounts.length, 'accounts')
       
-      const balancePromises = accounts.map(async (account) => {
-        try {
-          const accountData = await api.query.system.account(account.address)
-          const balance = accountData.data
-          
-          const free = balance.free.toString()
-          const reserved = balance.reserved.toString()
-          const total = balance.free.add(balance.reserved).toString()
-          
-          // Format balance (assuming 12 decimals for DOT/WND)
-          const decimals = api.registry.chainDecimals[0] || 12
-          const freeFormatted = (BigInt(free) / BigInt(10 ** decimals)).toString()
-          const reservedFormatted = (BigInt(reserved) / BigInt(10 ** decimals)).toString()
-          const totalFormatted = (BigInt(total) / BigInt(10 ** decimals)).toString()
-          
-          return {
-            account: account.address,
-            free: freeFormatted,
-            reserved: reservedFormatted,
-            total: totalFormatted,
-            chain: 'Polkadot/Westend'
-          }
-        } catch (error) {
-          console.error(`Failed to load balance for ${account.address}:`, error)
-          return null
-        }
-      })
+      const allBalances: BalanceInfo[] = []
 
-      const results = await Promise.all(balancePromises)
-      const validBalances = results.filter((b): b is BalanceInfo => b !== null)
-      
-      setBalances(validBalances)
-      
-      // Calculate total value
-      const total = validBalances.reduce((sum, b) => {
-        return sum + BigInt(b.total)
-      }, BigInt(0))
-      setTotalValue(total.toString())
-      
-      console.log('Balances loaded:', validBalances)
+      // Query each account on each chain
+      for (const account of accounts) {
+        for (const chainApi of chainApis) {
+          if (!chainApi.api || chainApi.isLoading) continue
+
+          try {
+            const balance = await getBalance(chainApi.chain.name, account.address)
+            if (balance && parseFloat(balance.total) > 0) {
+              allBalances.push({
+                account: account.address,
+                free: balance.free,
+                reserved: balance.reserved,
+                total: balance.total,
+                chain: chainApi.chain.name,
+                token: balance.token
+              })
+            }
+          } catch (error) {
+            console.error(`Failed to load balance for ${account.address} on ${chainApi.chain.name}:`, error)
+          }
+        }
+      }
+
+      setBalances(allBalances)
+
+      // Calculate chain statistics
+      const stats = new Map<string, { count: number; total: string }>()
+      allBalances.forEach(balance => {
+        const existing = stats.get(balance.chain) || { count: 0, total: '0' }
+        stats.set(balance.chain, {
+          count: existing.count + 1,
+          total: (BigInt(existing.total) + BigInt(Math.floor(parseFloat(balance.total) * 1000000))).toString()
+        })
+      })
+      setChainStats(stats)
+
+      console.log('Balances loaded:', allBalances)
     } catch (error) {
       console.error('Failed to load balances:', error)
     } finally {
@@ -81,9 +83,29 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
     }
   }
 
-  if (isLoading) {
-    return <div className="portfolio-view">Loading portfolio...</div>
+  if (isInitializing || isLoading) {
+    return (
+      <div className="portfolio-view">
+        <h2>Portfolio Overview</h2>
+        <div className="loading-state">
+          <p>{isInitializing ? 'Connecting to chains...' : 'Loading balances...'}</p>
+          <div className="chain-status">
+            {chainApis.map(chainApi => (
+              <div key={chainApi.chain.name} className="chain-status-item">
+                <span className={chainApi.api ? 'status-connected' : chainApi.isLoading ? 'status-loading' : 'status-error'}>
+                  {chainApi.api ? '✓' : chainApi.isLoading ? '⋯' : '✗'}
+                </span>
+                <span>{chainApi.chain.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const connectedChains = chainApis.filter(ca => ca.api).length
+  const totalAccounts = new Set(balances.map(b => b.account)).size
 
   return (
     <div className="portfolio-view">
@@ -91,18 +113,38 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
       
       <div className="portfolio-summary">
         <div className="summary-card">
-          <h3>Total Value</h3>
-          <p className="total-value">{totalValue} DOT</p>
+          <h3>Connected Chains</h3>
+          <p className="total-value">{connectedChains}</p>
         </div>
         <div className="summary-card">
           <h3>Accounts</h3>
-          <p>{accounts.length}</p>
+          <p>{totalAccounts}</p>
         </div>
         <div className="summary-card">
-          <h3>Chains</h3>
-          <p>1</p>
+          <h3>Balances Found</h3>
+          <p>{balances.length}</p>
         </div>
       </div>
+
+      {chainStats.size > 0 && (
+        <div className="chain-stats-section">
+          <h3>Chain Summary</h3>
+          <div className="chain-stats-grid">
+            {Array.from(chainStats.entries()).map(([chain, stats]) => {
+              const chainInfo = chainApis.find(ca => ca.chain.name === chain)?.chain
+              return (
+                <div key={chain} className="chain-stat-card">
+                  <h4>{chain}</h4>
+                  <p className="stat-value">{stats.count} account{stats.count !== 1 ? 's' : ''}</p>
+                  {chainInfo && (
+                    <p className="stat-token">{chainInfo.token}</p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="balances-section">
         <h3>Account Balances</h3>
@@ -125,15 +167,15 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
                 <div className="balance-details">
                   <div className="balance-item">
                     <label>Total:</label>
-                    <span className="balance-value">{balance.total} DOT</span>
+                    <span className="balance-value">{balance.total} {balance.token}</span>
                   </div>
                   <div className="balance-item">
                     <label>Free:</label>
-                    <span>{balance.free} DOT</span>
+                    <span>{balance.free} {balance.token}</span>
                   </div>
                   <div className="balance-item">
                     <label>Reserved:</label>
-                    <span>{balance.reserved} DOT</span>
+                    <span>{balance.reserved} {balance.token}</span>
                   </div>
                 </div>
                 <div className="account-address">

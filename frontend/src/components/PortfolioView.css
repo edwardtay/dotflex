@@ -173,3 +173,90 @@
   margin-bottom: 0;
 }
 
+.loading-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-state p {
+  color: rgba(255, 255, 255, 0.87);
+  margin-bottom: 1.5rem;
+}
+
+.chain-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.chain-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.status-connected {
+  color: #4ade80;
+}
+
+.status-loading {
+  color: #fbbf24;
+}
+
+.status-error {
+  color: #ff6b6b;
+}
+
+.chain-stats-section {
+  background-color: #1a1a1a;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  margin-bottom: 2rem;
+}
+
+.chain-stats-section h3 {
+  color: #e6007a;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.chain-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.chain-stat-card {
+  background-color: #2a2a2a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  text-align: center;
+}
+
+.chain-stat-card h4 {
+  color: #e6007a;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.stat-value {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.stat-token {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
