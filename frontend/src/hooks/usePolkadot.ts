@@ -15,29 +15,40 @@ export function usePolkadot() {
   useEffect(() => {
     let provider: WsProvider | null = null
     let apiInstance: ApiPromise | null = null
+    let cancelled = false
 
     const initApi = async () => {
       try {
         console.log('Initializing Polkadot API connection to:', RPC_URL)
         provider = new WsProvider(RPC_URL)
         apiInstance = await ApiPromise.create({ provider })
-        setApi(apiInstance)
-        console.log('Polkadot API connected successfully')
+        
+        if (!cancelled) {
+          setApi(apiInstance)
+          console.log('Polkadot API connected successfully')
+        }
       } catch (error) {
         console.error('Failed to initialize Polkadot API:', error)
+        if (!cancelled) {
+          // Set API to null but still allow app to render
+          setApi(null)
+        }
       } finally {
-        setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
     initApi()
 
     return () => {
+      cancelled = true
       if (apiInstance) {
-        apiInstance.disconnect()
+        apiInstance.disconnect().catch(console.error)
       }
       if (provider) {
-        provider.disconnect()
+        provider.disconnect().catch(console.error)
       }
     }
   }, [])

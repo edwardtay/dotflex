@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { usePolkadot } from './hooks/usePolkadot'
 import WalletConnect from './components/WalletConnect'
@@ -8,7 +7,18 @@ import CredentialsManager from './components/CredentialsManager'
 import './App.css'
 
 function App() {
-  const { api, accounts, selectedAccount, isConnected, connectWallet } = usePolkadot()
+  const { api, accounts, selectedAccount, isConnected, isLoading, connectWallet } = usePolkadot()
+
+  if (isLoading) {
+    return (
+      <div className="app-loading">
+        <div className="loading-content">
+          <h2>Loading...</h2>
+          <p>Connecting to Polkadot network...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Router>

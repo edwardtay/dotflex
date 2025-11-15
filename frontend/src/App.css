@@ -4,6 +4,28 @@
   flex-direction: column;
 }
 
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #242424;
+}
+
+.loading-content {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.loading-content h2 {
+  color: #e6007a;
+  margin-bottom: 1rem;
+}
+
+.loading-content p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
