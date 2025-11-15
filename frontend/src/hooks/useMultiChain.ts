@@ -33,7 +33,7 @@ export const DEFAULT_CHAINS: ChainConfig[] = [
   },
   {
     name: 'Astar',
-    rpcUrl: 'wss://rpc.astar.network',
+    rpcUrl: 'wss://astar-rpc.dwellir.com',
     token: 'ASTR',
     decimals: 18,
     enabled: true
@@ -54,14 +54,14 @@ export const DEFAULT_CHAINS: ChainConfig[] = [
   },
   {
     name: 'Acala',
-    rpcUrl: 'wss://acala-polkadot.api.onfinality.io/public-ws',
+    rpcUrl: 'wss://acala-rpc.dwellir.com',
     token: 'ACA',
     decimals: 12,
     enabled: true
   },
   {
     name: 'Karura',
-    rpcUrl: 'wss://karura.api.onfinality.io/public-ws',
+    rpcUrl: 'wss://karura-rpc.dwellir.com',
     token: 'KAR',
     decimals: 12,
     enabled: true
@@ -104,35 +104,61 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
       }
       setChainApis(new Map(apis))
 
-      // Connect to each chain
+      // Connect to each chain with retry logic
       const connectionPromises = chains.map(async (chain) => {
-        try {
-          console.log(`Connecting to ${chain.name}...`)
-          const provider = new WsProvider(chain.rpcUrl)
-          const api = await ApiPromise.create({ provider })
-          
-          if (!cancelled) {
-            apis.set(chain.name, {
-              chain,
-              api,
-              isLoading: false,
-              error: null
-            })
-            setChainApis(new Map(apis))
-            console.log(`Connected to ${chain.name}`)
-          } else {
-            await api.disconnect()
-          }
-        } catch (error: any) {
-          console.error(`Failed to connect to ${chain.name}:`, error)
-          if (!cancelled) {
-            apis.set(chain.name, {
-              chain,
-              api: null,
-              isLoading: false,
-              error: error.message || 'Connection failed'
-            })
-            setChainApis(new Map(apis))
+        const maxRetries = 2
+        let lastError: any = null
+        
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          try {
+            if (attempt > 0) {
+              console.log(`Retrying connection to ${chain.name} (attempt ${attempt + 1}/${maxRetries + 1})...`)
+              await new Promise(resolve => setTimeout(resolve, 2000 * attempt)) // Exponential backoff
+            } else {
+              console.log(`Connecting to ${chain.name}...`)
+            }
+            
+            const provider = new WsProvider(chain.rpcUrl, 5000) // 5 second timeout
+            const api = await Promise.race([
+              ApiPromise.create({ provider }),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Connection timeout')), 15000)
+              )
+            ]) as ApiPromise
+            
+            // Wait for API to be ready
+            await api.isReady
+            
+            if (!cancelled) {
+              activeConnections.push(api)
+              apis.set(chain.name, {
+                chain,
+                api,
+                isLoading: false,
+                error: null
+              })
+              setChainApis(new Map(apis))
+              console.log(`✓ Connected to ${chain.name}`)
+              return // Success, exit retry loop
+            } else {
+              await api.disconnect()
+              return
+            }
+          } catch (error: any) {
+            lastError = error
+            console.warn(`Failed to connect to ${chain.name} (attempt ${attempt + 1}):`, error.message || error)
+            
+            // If this was the last attempt, mark as failed
+            if (attempt === maxRetries && !cancelled) {
+              apis.set(chain.name, {
+                chain,
+                api: null,
+                isLoading: false,
+                error: lastError.message || 'Connection failed after retries'
+              })
+              setChainApis(new Map(apis))
+              console.error(`✗ Failed to connect to ${chain.name} after ${maxRetries + 1} attempts`)
+            }
           }
         }
       })
@@ -148,10 +174,14 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
 
     return () => {
       cancelled = true
-      // Disconnect all APIs
-      apis.forEach((chainApi) => {
-        if (chainApi.api) {
-          chainApi.api.disconnect().catch(console.error)
+      // Disconnect all APIs gracefully
+      activeConnections.forEach((api) => {
+        try {
+          api.disconnect().catch(() => {
+            // Ignore disconnect errors during cleanup
+          })
+        } catch (e) {
+          // Ignore errors during cleanup
         }
       })
     }
