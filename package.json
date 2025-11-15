@@ -1,0 +1,32 @@
+{
+  "name": "polkadot-identity-portfolio-manager",
+  "version": "0.1.0",
+  "description": "Decentralized Identity Portfolio Manager for Polkadot Hackathon",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "services",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend & npm run dev --workspace=services",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "polkadot",
+    "web3",
+    "identity",
+    "portfolio",
+    "privacy",
+    "blockchain"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+
