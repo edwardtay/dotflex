@@ -95,7 +95,7 @@ export function usePolkadot() {
       const manualAccount: InjectedAccountWithMeta = {
         address: address.trim(),
         meta: {
-          name: 'Manual Entry',
+          name: '', // Empty name, will show address instead
           source: 'manual',
           genesisHash: null,
           whenCreated: Date.now()

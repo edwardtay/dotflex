@@ -25,10 +25,11 @@ function App() {
       <div className="app">
         <nav className="navbar">
           <div className="nav-brand">
-            <h1>PolkaPocket</h1>
+            <Link to="/" className="logo-link">
+              <h1>PolkaPocket</h1>
+            </Link>
           </div>
           <div className="nav-links">
-            <Link to="/">Home</Link>
             <Link to="/identity">Identity</Link>
             <Link to="/portfolio">Portfolio</Link>
             <Link to="/credentials">Credentials</Link>
@@ -37,7 +38,6 @@ function App() {
             {isConnected ? (
               <div className="wallet-info">
                 <span>{selectedAccount?.meta.name || selectedAccount?.address.substring(0, 12) + '...'}</span>
-                {isManualMode && <span className="manual-badge">Manual</span>}
               </div>
             ) : (
               <button onClick={connectWallet}>Connect Wallet</button>

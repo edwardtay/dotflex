@@ -41,6 +41,16 @@
   color: #e6007a;
 }
 
+.logo-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.25s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
 .nav-links {
   display: flex;
   gap: 2rem;
@@ -71,14 +81,6 @@
   font-size: 0.9rem;
 }
 
-.manual-badge {
-  padding: 0.25rem 0.5rem;
-  background-color: #2a3a2a;
-  color: #4ade80;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
 
 .main-content {
   flex: 1;
