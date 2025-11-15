@@ -95,7 +95,13 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
   }, [accounts, chainApis, getBalance])
 
   useEffect(() => {
-    if (!isInitializing && accounts.length > 0) {
+    if (!isInitializing) {
+      if (accounts.length === 0) {
+        console.log('[Portfolio] No accounts connected')
+        setIsLoading(false)
+        return
+      }
+      
       const connectedChains = chainApis.filter(ca => ca.api && !ca.isLoading)
       if (connectedChains.length > 0) {
         console.log(`[Portfolio] Effect triggered - ${connectedChains.length} chains ready, ${accounts.length} accounts`)
@@ -106,6 +112,8 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
         return () => clearTimeout(timer)
       } else {
         console.log('[Portfolio] Waiting for chains to connect...')
+        // Still set loading to false if chains aren't ready but we have accounts
+        setIsLoading(false)
       }
     }
   }, [isInitializing, accounts.length, chainApis.filter(ca => ca.api).length, loadBalances])
@@ -131,6 +139,19 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
     )
   }
 
+  // Handle case when no accounts are connected
+  if (accounts.length === 0) {
+    return (
+      <div className="portfolio-view">
+        <h2>Portfolio Overview</h2>
+        <div className="no-balances">
+          <p>No accounts connected.</p>
+          <p className="hint">Please connect your wallet or enter an address manually to view your portfolio.</p>
+        </div>
+      </div>
+    )
+  }
+
   const connectedChains = chainApis.filter(ca => ca.api).length
   const totalAccounts = new Set(balances.map(b => b.account)).size
 
@@ -145,7 +166,7 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
         </div>
         <div className="summary-card">
           <h3>Accounts</h3>
-          <p>{totalAccounts}</p>
+          <p>{accounts.length}</p>
         </div>
         <div className="summary-card">
           <h3>Balances Found</h3>
