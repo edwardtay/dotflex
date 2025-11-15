@@ -183,18 +183,18 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
       const totalBigInt = BigInt(total)
       const divisor = BigInt(10 ** decimals)
       
-      // Calculate with proper decimal handling
-      const freeFormatted = (freeBigInt / divisor).toString() + '.' + 
-        (freeBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
-      const reservedFormatted = (reservedBigInt / divisor).toString() + '.' + 
-        (reservedBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
-      const totalFormatted = (totalBigInt / divisor).toString() + '.' + 
-        (totalBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
+      // Format with proper decimal handling
+      const formatBalance = (value: bigint): string => {
+        const wholePart = value / divisor
+        const fractionalPart = value % divisor
+        const fractionalStr = fractionalPart.toString().padStart(decimals, '0').replace(/0+$/, '')
+        return fractionalStr ? `${wholePart}.${fractionalStr}` : wholePart.toString()
+      }
       
       return {
-        free: freeFormatted || '0',
-        reserved: reservedFormatted || '0',
-        total: totalFormatted || '0',
+        free: formatBalance(freeBigInt),
+        reserved: formatBalance(reservedBigInt),
+        total: formatBalance(totalBigInt),
         token: chainApi.chain.token
       }
     } catch (error) {
