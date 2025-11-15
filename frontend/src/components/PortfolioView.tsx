@@ -26,16 +26,26 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
 
   const loadBalances = useCallback(async () => {
     if (accounts.length === 0) {
-      console.log('No accounts to query balances for')
+      console.log('[Portfolio] No accounts to query balances for')
       setIsLoading(false)
+      setBalances([])
       return
     }
 
     try {
       setIsLoading(true)
       const connectedChains = chainApis.filter(ca => ca.api && !ca.isLoading)
+      
+      if (connectedChains.length === 0) {
+        console.warn('[Portfolio] No connected chains available')
+        setIsLoading(false)
+        setBalances([])
+        return
+      }
+      
       console.log(`[Portfolio] Loading balances from ${connectedChains.length} connected chains for ${accounts.length} accounts`)
       console.log(`[Portfolio] Connected chains:`, connectedChains.map(ca => ca.chain.name))
+      console.log(`[Portfolio] Account addresses:`, accounts.map(a => a.address))
       
       const allBalances: BalanceInfo[] = []
       const queryPromises: Promise<void>[] = []
@@ -69,9 +79,17 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
       }
 
       // Wait for all queries to complete
-      await Promise.allSettled(queryPromises)
-
+      const results = await Promise.allSettled(queryPromises)
+      const failed = results.filter(r => r.status === 'rejected').length
+      const succeeded = results.filter(r => r.status === 'fulfilled').length
+      
+      console.log(`[Portfolio] Query results: ${succeeded} succeeded, ${failed} failed`)
       console.log(`[Portfolio] Completed. Found ${allBalances.length} balances`)
+      
+      if (allBalances.length === 0) {
+        console.warn('[Portfolio] No balances found. Check console for individual chain errors.')
+      }
+      
       setBalances(allBalances)
 
       // Calculate chain statistics
