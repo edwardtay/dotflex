@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ApiPromise } from '@polkadot/api'
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
 import { useMultiChain } from '../hooks/useMultiChain'
@@ -24,13 +24,7 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [chainStats, setChainStats] = useState<Map<string, { count: number; total: string }>>(new Map())
 
-  useEffect(() => {
-    if (!isInitializing && accounts.length > 0 && chainApis.some(ca => ca.api)) {
-      loadBalances()
-    }
-  }, [isInitializing, accounts.length, chainApis.length])
-
-  const loadBalances = async () => {
+  const loadBalances = useCallback(async () => {
     if (accounts.length === 0) return
 
     try {
@@ -81,7 +75,13 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [accounts, chainApis, getBalance])
+
+  useEffect(() => {
+    if (!isInitializing && accounts.length > 0 && chainApis.some(ca => ca.api)) {
+      loadBalances()
+    }
+  }, [isInitializing, accounts.length, chainApis.length, loadBalances])
 
   if (isInitializing || isLoading) {
     return (
