@@ -40,7 +40,9 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
 
           try {
             const balance = await getBalance(chainApi.chain.name, account.address)
-            if (balance && parseFloat(balance.total) > 0) {
+            if (balance) {
+              console.log(`Balance for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}:`, balance)
+              // Show all balances, including zero balances
               allBalances.push({
                 account: account.address,
                 free: balance.free,
@@ -49,6 +51,8 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
                 chain: chainApi.chain.name,
                 token: balance.token
               })
+            } else {
+              console.log(`No balance returned for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}`)
             }
           } catch (error) {
             console.error(`Failed to load balance for ${account.address} on ${chainApi.chain.name}:`, error)
@@ -154,7 +158,13 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
         
         {balances.length === 0 ? (
           <div className="no-balances">
-            <p>No balances found. Make sure your accounts have funds.</p>
+            <p>No balances found for the connected accounts.</p>
+            <p className="hint">This could mean:</p>
+            <ul>
+              <li>The accounts don't have balances on these chains</li>
+              <li>Some chains are still connecting (check status above)</li>
+              <li>Try refreshing or check the browser console for errors</li>
+            </ul>
           </div>
         ) : (
           <div className="balances-list">

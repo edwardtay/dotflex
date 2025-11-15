@@ -177,14 +177,28 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
       const reserved = balance.reserved.toString()
       const total = balance.free.add(balance.reserved).toString()
       
+      // Convert to BigInt for division, then format with decimals
+      const freeBigInt = BigInt(free)
+      const reservedBigInt = BigInt(reserved)
+      const totalBigInt = BigInt(total)
+      const divisor = BigInt(10 ** decimals)
+      
+      // Calculate with proper decimal handling
+      const freeFormatted = (freeBigInt / divisor).toString() + '.' + 
+        (freeBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
+      const reservedFormatted = (reservedBigInt / divisor).toString() + '.' + 
+        (reservedBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
+      const totalFormatted = (totalBigInt / divisor).toString() + '.' + 
+        (totalBigInt % divisor).toString().padStart(decimals, '0').replace(/0+$/, '').replace(/\.$/, '')
+      
       return {
-        free: (BigInt(free) / BigInt(10 ** decimals)).toString(),
-        reserved: (BigInt(reserved) / BigInt(10 ** decimals)).toString(),
-        total: (BigInt(total) / BigInt(10 ** decimals)).toString(),
+        free: freeFormatted || '0',
+        reserved: reservedFormatted || '0',
+        total: totalFormatted || '0',
         token: chainApi.chain.token
       }
     } catch (error) {
-      console.error(`Failed to get balance from ${chainName}:`, error)
+      console.error(`Failed to get balance from ${chainName} for ${address.substring(0, 8)}...:`, error)
       return null
     }
   }, [chainApis])

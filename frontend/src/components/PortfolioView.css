@@ -79,6 +79,20 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.no-balances .hint {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.no-balances ul {
+  text-align: left;
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+}
+
 .balances-list {
   display: grid;
   gap: 1rem;
