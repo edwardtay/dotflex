@@ -1,8 +1,8 @@
-# Project Summary: PolkaPulse
+# Project Summary: PolkaPocket
 
 ## 🎯 Project Overview
 
-PolkaPulse is a user-centric Web3 application that combines self-sovereign identity management with cross-chain portfolio tracking, built on Polkadot's technology stack.
+PolkaPocket is a user-centric Web3 application that combines self-sovereign identity management with cross-chain portfolio tracking, built on Polkadot's technology stack.
 
 ## ✨ Key Features Implemented
 

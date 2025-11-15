@@ -1,7 +1,7 @@
 {
-  "name": "polkapulse",
+  "name": "polkapocket",
   "version": "0.1.0",
-  "description": "PolkaPulse - Decentralized Identity & Portfolio Manager for Polkadot Hackathon",
+  "description": "PolkaPocket - Decentralized Identity & Portfolio Manager for Polkadot Hackathon",
   "private": true,
   "workspaces": [
     "frontend",
