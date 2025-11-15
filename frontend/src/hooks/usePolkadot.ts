@@ -57,7 +57,7 @@ export function usePolkadot() {
   const connectWallet = useCallback(async () => {
     try {
       console.log('Connecting to Polkadot extension...')
-      const extensions = await web3Enable('Identity Portfolio Manager')
+      const extensions = await web3Enable('PolkaPulse')
       
       if (extensions.length === 0) {
         alert('Please install Polkadot.js extension')

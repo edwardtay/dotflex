@@ -1,10 +1,10 @@
-# Decentralized Identity Portfolio Manager
+# PolkaPulse
 
 A user-centric Web3 application that enables users to manage their cross-chain portfolio while maintaining privacy and self-sovereign identity using Polkadot's technology stack.
 
 ## Project Overview
 
-The Decentralized Identity Portfolio Manager brings together identity management and portfolio tracking in a privacy-preserving, user-controlled environment. Built on Polkadot's infrastructure, it leverages cross-chain capabilities to aggregate assets across the Polkadot ecosystem while giving users complete control over their identity and financial data.
+PolkaPulse brings together identity management and portfolio tracking in a privacy-preserving, user-controlled environment. Built on Polkadot's infrastructure, it leverages cross-chain capabilities to aggregate assets across the Polkadot ecosystem while giving users complete control over their identity and financial data.
 
 ### Key Features
 

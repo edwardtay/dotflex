@@ -1,8 +1,8 @@
-# Project Summary: Decentralized Identity Portfolio Manager
+# Project Summary: PolkaPulse
 
 ## 🎯 Project Overview
 
-A user-centric Web3 application that combines self-sovereign identity management with cross-chain portfolio tracking, built on Polkadot's technology stack.
+PolkaPulse is a user-centric Web3 application that combines self-sovereign identity management with cross-chain portfolio tracking, built on Polkadot's technology stack.
 
 ## ✨ Key Features Implemented
 

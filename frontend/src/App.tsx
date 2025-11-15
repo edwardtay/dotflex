@@ -25,7 +25,7 @@ function App() {
       <div className="app">
         <nav className="navbar">
           <div className="nav-brand">
-            <h1>Identity Portfolio Manager</h1>
+            <h1>PolkaPulse</h1>
           </div>
           <div className="nav-links">
             <Link to="/">Home</Link>
@@ -88,7 +88,7 @@ function App() {
 function Home() {
   return (
     <div className="home">
-      <h2>Welcome to Decentralized Identity Portfolio Manager</h2>
+      <h2>Welcome to PolkaPulse</h2>
       <p>Manage your identity and portfolio across the Polkadot ecosystem</p>
       <div className="features">
         <div className="feature-card">
