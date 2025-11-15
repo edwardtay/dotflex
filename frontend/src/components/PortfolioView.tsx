@@ -25,10 +25,10 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
   const [chainStats, setChainStats] = useState<Map<string, { count: number; total: string }>>(new Map())
 
   useEffect(() => {
-    if (!isInitializing && accounts.length > 0) {
+    if (!isInitializing && accounts.length > 0 && chainApis.some(ca => ca.api)) {
       loadBalances()
     }
-  }, [isInitializing, accounts, chainApis])
+  }, [isInitializing, accounts.length, chainApis.length])
 
   const loadBalances = async () => {
     if (accounts.length === 0) return
