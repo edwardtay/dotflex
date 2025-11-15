@@ -11,6 +11,7 @@ export function usePolkadot() {
   const [selectedAccount, setSelectedAccount] = useState<InjectedAccountWithMeta | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isManualMode, setIsManualMode] = useState(false)
 
   useEffect(() => {
     let provider: WsProvider | null = null
@@ -74,10 +75,43 @@ export function usePolkadot() {
       setAccounts(allAccounts)
       setSelectedAccount(allAccounts[0])
       setIsConnected(true)
+      setIsManualMode(false)
       console.log('Wallet connected successfully')
     } catch (error) {
       console.error('Failed to connect wallet:', error)
       alert('Failed to connect wallet. Please check Polkadot.js extension.')
+    }
+  }, [])
+
+  const connectManualAddress = useCallback((address: string) => {
+    try {
+      // Validate address format (basic check)
+      if (!address || address.trim().length === 0) {
+        alert('Please enter a valid address')
+        return false
+      }
+
+      // Create a mock account object for manual entry
+      const manualAccount: InjectedAccountWithMeta = {
+        address: address.trim(),
+        meta: {
+          name: 'Manual Entry',
+          source: 'manual',
+          genesisHash: null,
+          whenCreated: Date.now()
+        }
+      }
+
+      setAccounts([manualAccount])
+      setSelectedAccount(manualAccount)
+      setIsConnected(true)
+      setIsManualMode(true)
+      console.log('Manual address connected:', address)
+      return true
+    } catch (error) {
+      console.error('Failed to connect manual address:', error)
+      alert('Failed to connect address. Please check the address format.')
+      return false
     }
   }, [])
 
@@ -87,7 +121,9 @@ export function usePolkadot() {
     selectedAccount,
     isConnected,
     isLoading,
+    isManualMode,
     connectWallet,
+    connectManualAddress,
     setSelectedAccount
   }
 }

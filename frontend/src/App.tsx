@@ -7,7 +7,7 @@ import CredentialsManager from './components/CredentialsManager'
 import './App.css'
 
 function App() {
-  const { api, accounts, selectedAccount, isConnected, isLoading, connectWallet } = usePolkadot()
+  const { api, accounts, selectedAccount, isConnected, isLoading, isManualMode, connectWallet, connectManualAddress } = usePolkadot()
 
   if (isLoading) {
     return (
@@ -36,7 +36,8 @@ function App() {
           <div className="nav-wallet">
             {isConnected ? (
               <div className="wallet-info">
-                <span>{selectedAccount?.meta.name || selectedAccount?.address}</span>
+                <span>{selectedAccount?.meta.name || selectedAccount?.address.substring(0, 12) + '...'}</span>
+                {isManualMode && <span className="manual-badge">Manual</span>}
               </div>
             ) : (
               <button onClick={connectWallet}>Connect Wallet</button>
@@ -51,9 +52,9 @@ function App() {
               path="/identity" 
               element={
                 isConnected ? (
-                  <IdentityManager api={api} account={selectedAccount} />
+                  <IdentityManager api={api} account={selectedAccount} isManualMode={isManualMode} />
                 ) : (
-                  <WalletConnect onConnect={connectWallet} />
+                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
                 )
               } 
             />
@@ -63,7 +64,7 @@ function App() {
                 isConnected ? (
                   <PortfolioView api={api} accounts={accounts} />
                 ) : (
-                  <WalletConnect onConnect={connectWallet} />
+                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
                 )
               } 
             />
@@ -73,7 +74,7 @@ function App() {
                 isConnected ? (
                   <CredentialsManager api={api} account={selectedAccount} />
                 ) : (
-                  <WalletConnect onConnect={connectWallet} />
+                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
                 )
               } 
             />

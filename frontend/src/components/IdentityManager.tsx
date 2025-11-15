@@ -7,6 +7,7 @@ import './IdentityManager.css'
 interface IdentityManagerProps {
   api: ApiPromise | null
   account: InjectedAccountWithMeta | null
+  isManualMode?: boolean
 }
 
 interface IdentityInfo {
@@ -19,7 +20,7 @@ interface IdentityInfo {
   hasIdentity: boolean
 }
 
-export default function IdentityManager({ api, account }: IdentityManagerProps) {
+export default function IdentityManager({ api, account, isManualMode = false }: IdentityManagerProps) {
   const [identity, setIdentity] = useState<IdentityInfo>({ hasIdentity: false })
   const [isLoading, setIsLoading] = useState(true)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
@@ -82,13 +83,29 @@ export default function IdentityManager({ api, account }: IdentityManagerProps) 
         <p><strong>Name:</strong> {account?.meta.name || 'Unnamed'}</p>
       </div>
 
+      {isManualMode && (
+        <div className="manual-mode-notice">
+          <p><strong>Manual Mode:</strong> You're viewing this address in read-only mode. To register or update identity, please connect your wallet.</p>
+        </div>
+      )}
+
       {showRegistrationForm ? (
-        <IdentityRegistrationForm
-          api={api}
-          account={account}
-          onSuccess={handleRegistrationSuccess}
-          onCancel={() => setShowRegistrationForm(false)}
-        />
+        isManualMode ? (
+          <div className="manual-mode-error">
+            <h3>Wallet Connection Required</h3>
+            <p>To register or update identity, you need to connect your Polkadot.js extension wallet. Manual address entry is read-only.</p>
+            <button onClick={() => setShowRegistrationForm(false)} className="back-button">
+              Go Back
+            </button>
+          </div>
+        ) : (
+          <IdentityRegistrationForm
+            api={api}
+            account={account}
+            onSuccess={handleRegistrationSuccess}
+            onCancel={() => setShowRegistrationForm(false)}
+          />
+        )
       ) : identity.hasIdentity ? (
         <div className="identity-display">
           <h3>Your Identity</h3>
@@ -134,24 +151,28 @@ export default function IdentityManager({ api, account }: IdentityManagerProps) 
             <button onClick={loadIdentity} className="refresh-button">
               Refresh Identity
             </button>
-            <button 
-              onClick={() => setShowRegistrationForm(true)}
-              className="update-button"
-            >
-              Update Identity
-            </button>
+            {!isManualMode && (
+              <button 
+                onClick={() => setShowRegistrationForm(true)}
+                className="update-button"
+              >
+                Update Identity
+              </button>
+            )}
           </div>
         </div>
       ) : (
         <div className="no-identity">
           <h3>No Identity Registered</h3>
           <p>Register an on-chain identity to get started with self-sovereign identity management.</p>
-          <button 
-            onClick={() => setShowRegistrationForm(true)}
-            className="register-button"
-          >
-            Register Identity
-          </button>
+          {!isManualMode && (
+            <button 
+              onClick={() => setShowRegistrationForm(true)}
+              className="register-button"
+            >
+              Register Identity
+            </button>
+          )}
           <div className="info-box">
             <p><strong>Note:</strong> Identity registration requires:</p>
             <ul>

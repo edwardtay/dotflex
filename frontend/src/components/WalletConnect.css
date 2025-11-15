@@ -5,6 +5,8 @@
   justify-content: center;
   min-height: 400px;
   padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .wallet-connect h2 {
@@ -15,21 +17,155 @@
 .wallet-connect p {
   margin-bottom: 2rem;
   color: rgba(255, 255, 255, 0.7);
+  text-align: center;
 }
 
-.connect-button {
+.connect-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.connect-button,
+.manual-button {
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  background-color: #e6007a;
-  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.25s;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+
+.connect-button {
+  background-color: #e6007a;
+  color: white;
 }
 
 .connect-button:hover {
   background-color: #c40066;
+}
+
+.manual-button {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.87);
+  border: 1px solid #333;
+}
+
+.manual-button:hover {
+  background-color: #2a2a2a;
+  border-color: #646cff;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #333;
+}
+
+.divider span {
+  padding: 0 1rem;
+}
+
+.manual-entry-form {
+  width: 100%;
+  max-width: 500px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.87);
+  font-weight: 500;
+}
+
+.address-input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.9rem;
+  font-family: monospace;
+  transition: border-color 0.25s;
+  box-sizing: border-box;
+}
+
+.address-input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.address-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.cancel-button,
+.submit-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+.submit-button {
+  background-color: #e6007a;
+  color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #c40066;
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: #2a2a2a;
+  color: rgba(255, 255, 255, 0.87);
+  border: 1px solid #333;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background-color: #3a3a3a;
+}
+
+.cancel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .instructions {

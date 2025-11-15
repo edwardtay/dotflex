@@ -62,10 +62,22 @@
 }
 
 .wallet-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
   background-color: #2a2a2a;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+
+.manual-badge {
+  padding: 0.25rem 0.5rem;
+  background-color: #2a3a2a;
+  color: #4ade80;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .main-content {
