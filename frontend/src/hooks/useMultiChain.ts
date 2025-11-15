@@ -165,17 +165,39 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
   } | null> => {
     const chainApi = chainApis.get(chainName)
     if (!chainApi || !chainApi.api) {
+      console.log(`[${chainName}] API not available`)
       return null
     }
 
     try {
-      const accountData = await chainApi.api.query.system.account(address)
+      // Wait for API to be ready
+      await chainApi.api.isReady
+      
+      console.log(`[${chainName}] Querying balance for ${address.substring(0, 8)}...`)
+      
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), 10000)
+      )
+      
+      const accountData = await Promise.race([
+        chainApi.api.query.system.account(address),
+        timeoutPromise
+      ]) as any
+      
+      if (!accountData || !accountData.data) {
+        console.warn(`[${chainName}] No account data returned`)
+        return null
+      }
+      
       const balance = accountData.data
       
       const decimals = chainApi.chain.decimals
       const free = balance.free.toString()
       const reserved = balance.reserved.toString()
       const total = balance.free.add(balance.reserved).toString()
+      
+      console.log(`[${chainName}] Raw balance - free: ${free}, reserved: ${reserved}, total: ${total}`)
       
       // Convert to BigInt for division, then format with decimals
       const freeBigInt = BigInt(free)
@@ -191,14 +213,17 @@ export function useMultiChain(chains: ChainConfig[] = DEFAULT_CHAINS.filter(c =>
         return fractionalStr ? `${wholePart}.${fractionalStr}` : wholePart.toString()
       }
       
-      return {
+      const formatted = {
         free: formatBalance(freeBigInt),
         reserved: formatBalance(reservedBigInt),
         total: formatBalance(totalBigInt),
         token: chainApi.chain.token
       }
-    } catch (error) {
-      console.error(`Failed to get balance from ${chainName} for ${address.substring(0, 8)}...:`, error)
+      
+      console.log(`[${chainName}] Formatted balance:`, formatted)
+      return formatted
+    } catch (error: any) {
+      console.error(`[${chainName}] Failed to get balance for ${address.substring(0, 8)}...:`, error.message || error)
       return null
     }
   }, [chainApis])

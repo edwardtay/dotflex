@@ -25,41 +25,53 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
   const [chainStats, setChainStats] = useState<Map<string, { count: number; total: string }>>(new Map())
 
   const loadBalances = useCallback(async () => {
-    if (accounts.length === 0) return
+    if (accounts.length === 0) {
+      console.log('No accounts to query balances for')
+      setIsLoading(false)
+      return
+    }
 
     try {
       setIsLoading(true)
-      console.log('Loading balances from', chainApis.length, 'chains for', accounts.length, 'accounts')
+      const connectedChains = chainApis.filter(ca => ca.api && !ca.isLoading)
+      console.log(`[Portfolio] Loading balances from ${connectedChains.length} connected chains for ${accounts.length} accounts`)
+      console.log(`[Portfolio] Connected chains:`, connectedChains.map(ca => ca.chain.name))
       
       const allBalances: BalanceInfo[] = []
+      const queryPromises: Promise<void>[] = []
 
-      // Query each account on each chain
+      // Query each account on each chain in parallel
       for (const account of accounts) {
-        for (const chainApi of chainApis) {
-          if (!chainApi.api || chainApi.isLoading) continue
-
-          try {
-            const balance = await getBalance(chainApi.chain.name, account.address)
-            if (balance) {
-              console.log(`Balance for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}:`, balance)
-              // Show all balances, including zero balances
-              allBalances.push({
-                account: account.address,
-                free: balance.free,
-                reserved: balance.reserved,
-                total: balance.total,
-                chain: chainApi.chain.name,
-                token: balance.token
-              })
-            } else {
-              console.log(`No balance returned for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}`)
+        for (const chainApi of connectedChains) {
+          const queryPromise = (async () => {
+            try {
+              console.log(`[Portfolio] Querying ${chainApi.chain.name} for ${account.address.substring(0, 12)}...`)
+              const balance = await getBalance(chainApi.chain.name, account.address)
+              if (balance) {
+                console.log(`[Portfolio] ✓ Balance found on ${chainApi.chain.name}:`, balance)
+                allBalances.push({
+                  account: account.address,
+                  free: balance.free,
+                  reserved: balance.reserved,
+                  total: balance.total,
+                  chain: chainApi.chain.name,
+                  token: balance.token
+                })
+              } else {
+                console.log(`[Portfolio] ✗ No balance returned for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}`)
+              }
+            } catch (error: any) {
+              console.error(`[Portfolio] ✗ Failed to load balance for ${account.address.substring(0, 8)}... on ${chainApi.chain.name}:`, error.message || error)
             }
-          } catch (error) {
-            console.error(`Failed to load balance for ${account.address} on ${chainApi.chain.name}:`, error)
-          }
+          })()
+          queryPromises.push(queryPromise)
         }
       }
 
+      // Wait for all queries to complete
+      await Promise.allSettled(queryPromises)
+
+      console.log(`[Portfolio] Completed. Found ${allBalances.length} balances`)
       setBalances(allBalances)
 
       // Calculate chain statistics
@@ -73,19 +85,30 @@ export default function PortfolioView({ api, accounts }: PortfolioViewProps) {
       })
       setChainStats(stats)
 
-      console.log('Balances loaded:', allBalances)
-    } catch (error) {
-      console.error('Failed to load balances:', error)
+      console.log('[Portfolio] All balances:', allBalances)
+    } catch (error: any) {
+      console.error('[Portfolio] Failed to load balances:', error.message || error)
+      setBalances([])
     } finally {
       setIsLoading(false)
     }
   }, [accounts, chainApis, getBalance])
 
   useEffect(() => {
-    if (!isInitializing && accounts.length > 0 && chainApis.some(ca => ca.api)) {
-      loadBalances()
+    if (!isInitializing && accounts.length > 0) {
+      const connectedChains = chainApis.filter(ca => ca.api && !ca.isLoading)
+      if (connectedChains.length > 0) {
+        console.log(`[Portfolio] Effect triggered - ${connectedChains.length} chains ready, ${accounts.length} accounts`)
+        // Small delay to ensure APIs are fully ready
+        const timer = setTimeout(() => {
+          loadBalances()
+        }, 500)
+        return () => clearTimeout(timer)
+      } else {
+        console.log('[Portfolio] Waiting for chains to connect...')
+      }
     }
-  }, [isInitializing, accounts.length, chainApis.length, loadBalances])
+  }, [isInitializing, accounts.length, chainApis.filter(ca => ca.api).length, loadBalances])
 
   if (isInitializing || isLoading) {
     return (
