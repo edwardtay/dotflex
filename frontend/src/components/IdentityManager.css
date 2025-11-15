@@ -64,8 +64,15 @@
   border-radius: 4px;
 }
 
+.identity-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .refresh-button,
-.register-button {
+.register-button,
+.update-button {
   padding: 0.75rem 1.5rem;
   background-color: #e6007a;
   color: white;
@@ -77,13 +84,24 @@
 }
 
 .refresh-button:hover,
-.register-button:hover:not(:disabled) {
+.register-button:hover:not(:disabled),
+.update-button:hover {
   background-color: #c40066;
 }
 
 .register-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.update-button {
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+}
+
+.update-button:hover {
+  background-color: #3a3a3a;
+  border-color: #646cff;
 }
 
 .no-identity {

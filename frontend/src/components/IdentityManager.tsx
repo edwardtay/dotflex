@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ApiPromise } from '@polkadot/api'
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types'
+import IdentityRegistrationForm from './IdentityRegistrationForm'
 import './IdentityManager.css'
 
 interface IdentityManagerProps {
@@ -21,7 +22,7 @@ interface IdentityInfo {
 export default function IdentityManager({ api, account }: IdentityManagerProps) {
   const [identity, setIdentity] = useState<IdentityInfo>({ hasIdentity: false })
   const [isLoading, setIsLoading] = useState(true)
-  const [isRegistering, setIsRegistering] = useState(false)
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false)
 
   useEffect(() => {
     if (api && account) {
@@ -63,29 +64,10 @@ export default function IdentityManager({ api, account }: IdentityManagerProps) 
     }
   }
 
-  const registerIdentity = async () => {
-    if (!api || !account) return
-
-    try {
-      setIsRegistering(true)
-      console.log('Registering identity...')
-
-      // This would require signing a transaction
-      // For now, we'll show instructions
-      alert('Identity registration requires signing a transaction. Please use the Polkadot.js extension to sign.')
-      
-      // Example transaction (commented out - requires signing)
-      // const tx = api.tx.identity.setIdentity({
-      //   display: { raw: 'My Identity' }
-      // })
-      // await tx.signAndSend(account.address)
-      
-    } catch (error) {
-      console.error('Failed to register identity:', error)
-      alert('Failed to register identity. Please try again.')
-    } finally {
-      setIsRegistering(false)
-    }
+  const handleRegistrationSuccess = () => {
+    setShowRegistrationForm(false)
+    // Reload identity after successful registration
+    loadIdentity()
   }
 
   if (isLoading) {
@@ -100,7 +82,14 @@ export default function IdentityManager({ api, account }: IdentityManagerProps) 
         <p><strong>Name:</strong> {account?.meta.name || 'Unnamed'}</p>
       </div>
 
-      {identity.hasIdentity ? (
+      {showRegistrationForm ? (
+        <IdentityRegistrationForm
+          api={api}
+          account={account}
+          onSuccess={handleRegistrationSuccess}
+          onCancel={() => setShowRegistrationForm(false)}
+        />
+      ) : identity.hasIdentity ? (
         <div className="identity-display">
           <h3>Your Identity</h3>
           <div className="identity-fields">
@@ -141,20 +130,27 @@ export default function IdentityManager({ api, account }: IdentityManagerProps) 
               </div>
             )}
           </div>
-          <button onClick={loadIdentity} className="refresh-button">
-            Refresh Identity
-          </button>
+          <div className="identity-actions">
+            <button onClick={loadIdentity} className="refresh-button">
+              Refresh Identity
+            </button>
+            <button 
+              onClick={() => setShowRegistrationForm(true)}
+              className="update-button"
+            >
+              Update Identity
+            </button>
+          </div>
         </div>
       ) : (
         <div className="no-identity">
           <h3>No Identity Registered</h3>
           <p>Register an on-chain identity to get started with self-sovereign identity management.</p>
           <button 
-            onClick={registerIdentity} 
-            disabled={isRegistering}
+            onClick={() => setShowRegistrationForm(true)}
             className="register-button"
           >
-            {isRegistering ? 'Registering...' : 'Register Identity'}
+            Register Identity
           </button>
           <div className="info-box">
             <p><strong>Note:</strong> Identity registration requires:</p>
