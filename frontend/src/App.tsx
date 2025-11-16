@@ -1,46 +1,127 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import { usePolkadot } from './hooks/usePolkadot'
+import { useState, useEffect, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
+import { useWallets } from './hooks/useWallets'
 import WalletConnect from './components/WalletConnect'
-import IdentityManager from './components/IdentityManager'
+import WalletConnection from './components/WalletConnection'
 import PortfolioView from './components/PortfolioView'
-import CredentialsManager from './components/CredentialsManager'
+import PlayView from './components/PlayView'
+import MoonbeamPlayView from './components/MoonbeamPlayView'
+import ApiComparison from './components/ApiComparison'
+import CloudShowcase from './components/CloudShowcase'
+import PolkadotStats from './components/PolkadotStats'
+import StakingCalculator from './components/StakingCalculator'
 import './App.css'
 
-function App() {
-  const { api, accounts, selectedAccount, isConnected, isLoading, isManualMode, connectWallet, connectManualAddress } = usePolkadot()
+function AppContent() {
+  const location = useLocation()
+  const { 
+    polkadot, 
+    evm, 
+    isLoading, 
+    connectPolkadot, 
+    connectEVM, 
+    connectManualPolkadot, 
+    disconnectPolkadot, 
+    disconnectEVM 
+  } = useWallets()
+  const [showWalletMenu, setShowWalletMenu] = useState(false)
+  const walletMenuRef = useRef<HTMLDivElement>(null)
+
+
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (walletMenuRef.current && !walletMenuRef.current.contains(event.target as Node)) {
+        setShowWalletMenu(false)
+      }
+    }
+
+    if (showWalletMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showWalletMenu])
 
   if (isLoading) {
     return (
       <div className="app-loading">
         <div className="loading-content">
           <h2>Loading...</h2>
-          <p>Connecting to Polkadot network...</p>
+          <p>Initializing application...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <Router>
-      <div className="app">
+    <div className="app">
         <nav className="navbar">
           <div className="nav-brand">
             <Link to="/" className="logo-link">
-              <h1>PolkaPocket</h1>
+              <svg width="32" height="32" viewBox="0 0 1326 1410" fill="none">
+                <ellipse cx="663" cy="147.33" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="663" cy="1262.7" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="663" cy="705" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="180" cy="426.16" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="1146" cy="426.16" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="180" cy="983.84" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="1146" cy="983.84" rx="180" ry="104.16" fill="#E6007A"/>
+              </svg>
+              <h1>DotFlex</h1>
             </Link>
           </div>
           <div className="nav-links">
-            <Link to="/identity">Identity</Link>
-            <Link to="/portfolio">Portfolio</Link>
-            <Link to="/credentials">Credentials</Link>
+            <Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link>
+            <Link to="/cloud" className={location.pathname === '/cloud' ? 'active' : ''}>Polkadot Cloud</Link>
+            <Link to="/play" className={location.pathname === '/play' ? 'active' : ''}>Play</Link>
           </div>
           <div className="nav-wallet">
-            {isConnected ? (
-              <div className="wallet-info">
-                <span>{selectedAccount?.meta.name || selectedAccount?.address.substring(0, 12) + '...'}</span>
+            {(polkadot.isConnected && !polkadot.isManualMode) ? (
+              <div className="wallet-menu-container" ref={walletMenuRef}>
+                <button 
+                  className="wallet-info-button"
+                  onClick={() => setShowWalletMenu(!showWalletMenu)}
+                >
+                  <div className="wallet-status-badges">
+                    <span className="wallet-status-badge" title="Polkadot Wallet Connected">P</span>
+                  </div>
+                  <span className="wallet-menu-arrow">{showWalletMenu ? '▲' : '▼'}</span>
+                </button>
+                {showWalletMenu && (
+                  <div className="wallet-menu">
+                    <div className="wallet-status-section">
+                      <div className="wallet-status-header">
+                        <span className="wallet-type-icon">P</span>
+                        <span className="wallet-type-name">Polkadot Wallet</span>
+                        <span className="wallet-status-indicator connected">● Connected</span>
+                      </div>
+                      {polkadot.selectedAccount && (
+                        <div className="wallet-menu-item">
+                          <span className="wallet-address">{polkadot.selectedAccount.address}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="wallet-menu-divider"></div>
+                    <button 
+                      className="wallet-menu-item disconnect-button"
+                      onClick={() => {
+                        disconnectPolkadot()
+                        setShowWalletMenu(false)
+                      }}
+                    >
+                      Disconnect Polkadot Wallet
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <button onClick={connectWallet}>Connect Wallet</button>
+              <button onClick={connectPolkadot} className="connect-wallet-button">
+                Connect Polkadot Wallet
+              </button>
             )}
           </div>
         </nav>
@@ -49,38 +130,67 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route 
-              path="/identity" 
-              element={
-                isConnected ? (
-                  <IdentityManager api={api} account={selectedAccount} isManualMode={isManualMode} />
-                ) : (
-                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
-                )
-              } 
-            />
-            <Route 
               path="/portfolio" 
               element={
-                isConnected ? (
-                  <PortfolioView api={api} accounts={accounts} />
+                (polkadot.isConnected || polkadot.isManualMode) && polkadot.accounts.length > 0 ? (
+                  <PortfolioView api={polkadot.api} accounts={polkadot.accounts} isManualMode={polkadot.isManualMode} />
                 ) : (
-                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
+                  <WalletConnect 
+                    onConnectPolkadot={connectPolkadot}
+                    onManualConnect={connectManualPolkadot}
+                    polkadotConnected={polkadot.isConnected && !polkadot.isManualMode}
+                  />
                 )
               } 
             />
             <Route 
-              path="/credentials" 
-              element={
-                isConnected ? (
-                  <CredentialsManager api={api} account={selectedAccount} />
-                ) : (
-                  <WalletConnect onConnect={connectWallet} onManualConnect={connectManualAddress} />
-                )
-              } 
+              path="/cloud" 
+              element={<CloudShowcase api={polkadot.api} accounts={polkadot.accounts} />} 
+            />
+            <Route 
+              path="/play" 
+              element={<PlayView api={null} accounts={[]} />} 
+            />
+            <Route 
+              path="/api-comparison" 
+              element={<ApiComparison />} 
             />
           </Routes>
         </main>
+
+        <footer className="app-footer">
+          <div className="footer-content">
+            <p>
+              <svg width="16" height="16" viewBox="0 0 1326 1410" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '0.5rem' }}>
+                <ellipse cx="663" cy="147.33" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="663" cy="1262.7" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="663" cy="705" rx="254" ry="147.33" fill="#E6007A"/>
+                <ellipse cx="180" cy="426.16" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="1146" cy="426.16" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="180" cy="983.84" rx="180" ry="104.16" fill="#E6007A"/>
+                <ellipse cx="1146" cy="983.84" rx="180" ry="104.16" fill="#E6007A"/>
+              </svg>
+              Powered by{' '}
+              <a href="https://polkadot.com" target="_blank" rel="noopener noreferrer">
+                Polkadot
+              </a>
+            </p>
+            <p>
+              <span>✨</span> Made by{' '}
+              <a href="https://edwardtay.com" target="_blank" rel="noopener noreferrer">
+                Edward
+              </a>
+            </p>
+          </div>
+        </footer>
       </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   )
 }
@@ -88,24 +198,62 @@ function App() {
 function Home() {
   return (
     <div className="home">
-      <h2>Welcome to PolkaPocket</h2>
-      <p>Manage your identity and portfolio across the Polkadot ecosystem</p>
+      <div className="home-hero">
+        <img src="/flex-hero.svg" alt="Flex Your DOT" className="flex-hero-image" />
+      </div>
+      <h2>Welcome to DotFlex</h2>
+      <p className="home-description">Your Polkadot Portfolio Tracker with Gamification</p>
+      <p>Track your DOT balance, staking info, and transaction history. Level up by flexing your holdings and play fun games!</p>
+      
+      <PolkadotStats />
+      <StakingCalculator />
+      
       <div className="features">
         <div className="feature-card">
-          <h3>Self-Sovereign Identity</h3>
-          <p>Control your identity with Polkadot's identity pallet</p>
+          <h3>📊 Portfolio Tracking</h3>
+          <p>View your DOT balance, staking details, and recent transfers. Connect wallet or enter address manually.</p>
         </div>
         <div className="feature-card">
-          <h3>Cross-Chain Portfolio</h3>
-          <p>Track assets across Polkadot and parachains</p>
+          <h3>💪 Flex & Level Up</h3>
+          <p>Earn XP and level up by flexing your DOT holdings. Share achievements on Twitter and climb the ranks!</p>
         </div>
         <div className="feature-card">
-          <h3>Privacy-Preserving</h3>
-          <p>Zero-knowledge proofs for secure analytics</p>
+          <h3>🎮 Fun Games</h3>
+          <p>Play coin flip and dice games with win streaks. No wallet needed - just pure fun!</p>
         </div>
-        <div className="feature-card">
-          <h3>Decentralized Credentials</h3>
-          <p>Verifiable credentials for DeFi and KYC</p>
+      </div>
+
+      <div className="faq-section">
+        <h3>Frequently Asked Questions</h3>
+        <div className="faq-list">
+          <div className="faq-item">
+            <h4>What is DotFlex?</h4>
+            <p>DotFlex is a Polkadot portfolio tracker with gamification. Track your DOT balance, staking info, and transactions. Level up by flexing your holdings and play fun games!</p>
+          </div>
+          <div className="faq-item">
+            <h4>What can I do with DotFlex?</h4>
+            <p>Track your Polkadot portfolio, view staking details and transaction history, flex your DOT to earn XP and level up, share achievements on Twitter, and play fun games like coin flip and dice roll.</p>
+          </div>
+          <div className="faq-item">
+            <h4>How do I connect my wallet?</h4>
+            <p>You can connect using the Polkadot Wallet browser extension, or manually enter your address. The app will automatically query all supported chains for your balances.</p>
+          </div>
+          <div className="faq-item">
+            <h4>Do I need a Subscan API key?</h4>
+            <p>For best results, yes. Set your Subscan API key in the environment variables. Without it, the app will fall back to direct RPC queries which may be slower and miss some chains.</p>
+          </div>
+          <div className="faq-item">
+            <h4>What is Polkadot?</h4>
+            <p>Polkadot is a next-generation blockchain protocol that connects multiple specialized blockchains into one unified network. It enables cross-chain transfers of any type of data or asset, not just tokens, making it possible to create new applications and services.</p>
+          </div>
+          <div className="faq-item">
+            <h4>Is my data private?</h4>
+            <p>Yes. DotFlex runs entirely in your browser. Your addresses and balances are only queried locally. We never store or transmit your private data to any server.</p>
+          </div>
+          <div className="faq-item">
+            <h4>Can I use this without a wallet?</h4>
+            <p>Yes! You can manually enter any Polkadot address to view its portfolio. No wallet connection required for viewing balances.</p>
+          </div>
         </div>
       </div>
     </div>

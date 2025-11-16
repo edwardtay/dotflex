@@ -1,7 +1,7 @@
 {
-  "name": "polkapocket",
+  "name": "dotflex",
   "version": "0.1.0",
-  "description": "PolkaPocket - Decentralized Identity & Portfolio Manager for Polkadot Hackathon",
+  "description": "DotFlex - Portfolio tracker and social flex platform for Polkadot",
   "private": true,
   "workspaces": [
     "frontend",
@@ -17,16 +17,16 @@
   "keywords": [
     "polkadot",
     "web3",
-    "identity",
     "portfolio",
-    "privacy",
-    "blockchain"
+    "gamification",
+    "blockchain",
+    "dot"
   ],
   "author": "",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
-  }
+  },
+  "devDependencies": {}
 }
-

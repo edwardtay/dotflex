@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="flexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e6007a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e6007a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#flexGradient)" opacity="0.2"/>
+  
+  <!-- Flexing arm/muscle shape -->
+  <path d="M 60 80 Q 70 60, 80 70 Q 90 80, 100 75 Q 110 80, 120 70 Q 130 60, 140 80 Q 135 100, 130 120 Q 125 130, 120 125 Q 115 120, 110 125 Q 105 130, 100 125 Q 95 130, 90 125 Q 85 120, 80 125 Q 75 130, 70 120 Q 65 100, 60 80 Z" 
+        fill="url(#flexGradient)" opacity="0.8"/>
+  
+  <!-- DOT symbol in center -->
+  <circle cx="100" cy="100" r="25" fill="url(#dotGradient)"/>
+  <text x="100" y="110" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">DOT</text>
+  
+  <!-- Sparkle effects -->
+  <circle cx="50" cy="50" r="3" fill="#ff0080" opacity="0.8">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="50" r="3" fill="#ff0080" opacity="0.8">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="50" cy="150" r="3" fill="#ff0080" opacity="0.8">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="150" r="3" fill="#ff0080" opacity="0.8">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+

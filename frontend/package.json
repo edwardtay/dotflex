@@ -1,5 +1,5 @@
 {
-  "name": "polkapocket-frontend",
+  "name": "dotflex-frontend",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@polkadot/api": "^10.11.2",
+    "@polkadot/api-contract": "^10.13.1",
     "@polkadot/extension-dapp": "^0.50.1",
     "@polkadot/util": "^12.6.2",
     "@polkadot/util-crypto": "^12.6.2",
     "axios": "^1.6.2",
+    "ethers": "^6.15.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1",

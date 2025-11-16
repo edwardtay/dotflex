@@ -57,10 +57,20 @@ export function usePolkadot() {
   const connectWallet = useCallback(async () => {
     try {
       console.log('Connecting to Polkadot extension...')
-      const extensions = await web3Enable('PolkaPocket')
+      
+      // Check if MetaMask is connected but Polkadot.js is not
+      const hasMetaMask = typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask
+      if (hasMetaMask) {
+        console.warn('MetaMask detected, but this app requires Polkadot.js extension')
+      }
+      
+      const extensions = await web3Enable('DotFlex')
       
       if (extensions.length === 0) {
-        alert('Please install Polkadot.js extension')
+        const errorMsg = hasMetaMask 
+          ? 'This app requires Polkadot.js extension (not MetaMask).\n\nMetaMask is for Ethereum chains, but this app works with Polkadot/Substrate chains.\n\nPlease install Polkadot.js extension from: https://polkadot.js.org/extension/\n\nOr use manual address entry below.'
+          : 'Please install Polkadot.js extension from: https://polkadot.js.org/extension/\n\nOr use manual address entry below.'
+        alert(errorMsg)
         return
       }
 
@@ -68,7 +78,7 @@ export function usePolkadot() {
       console.log('Found accounts:', allAccounts.length)
       
       if (allAccounts.length === 0) {
-        alert('No accounts found. Please create an account in Polkadot.js extension')
+        alert('No accounts found. Please create an account in Polkadot.js extension.\n\nOr use manual address entry below.')
         return
       }
 
@@ -79,7 +89,11 @@ export function usePolkadot() {
       console.log('Wallet connected successfully')
     } catch (error) {
       console.error('Failed to connect wallet:', error)
-      alert('Failed to connect wallet. Please check Polkadot.js extension.')
+      const hasMetaMask = typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask
+      const errorMsg = hasMetaMask
+        ? 'Failed to connect wallet. This app requires Polkadot.js extension (not MetaMask).\n\nPlease install Polkadot.js extension or use manual address entry.'
+        : 'Failed to connect wallet. Please check Polkadot.js extension or use manual address entry.'
+      alert(errorMsg)
     }
   }, [])
 
@@ -115,6 +129,14 @@ export function usePolkadot() {
     }
   }, [])
 
+  const disconnectWallet = useCallback(() => {
+    setAccounts([])
+    setSelectedAccount(null)
+    setIsConnected(false)
+    setIsManualMode(false)
+    console.log('Wallet disconnected')
+  }, [])
+
   return {
     api,
     accounts,
@@ -124,6 +146,7 @@ export function usePolkadot() {
     isManualMode,
     connectWallet,
     connectManualAddress,
+    disconnectWallet,
     setSelectedAccount
   }
 }

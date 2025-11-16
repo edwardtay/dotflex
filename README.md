@@ -1,39 +1,37 @@
-# PolkaPocket
+# DotFlex
 
-A user-centric Web3 application that enables users to manage their cross-chain portfolio while maintaining privacy and self-sovereign identity using Polkadot's technology stack.
+**Polkadot Portfolio Tracker with Gamification**
+
+DotFlex is a portfolio tracker for Polkadot with gamification features. Track your DOT balance, staking info, transaction history, and play fun games!
 
 ## Project Overview
 
-PolkaPocket brings together identity management and portfolio tracking in a privacy-preserving, user-controlled environment. Built on Polkadot's infrastructure, it leverages cross-chain capabilities to aggregate assets across the Polkadot ecosystem while giving users complete control over their identity and financial data.
+DotFlex provides a clean interface to view your Polkadot portfolio with detailed account information, staking status, and transaction history. Built with Subscan API integration for reliable data.
 
 ### Key Features
 
-- **Self-Sovereign Identity**: Manage your identity using Polkadot's identity pallet with full control over your credentials
-- **Cross-Chain Portfolio Aggregation**: Track assets across Polkadot, parachains, and external chains
-- **Privacy-Preserving Analytics**: Zero-knowledge proofs for portfolio statistics without exposing sensitive data
-- **Decentralized Credentials**: Verifiable credentials system for DeFi/KYC verification
-- **User-Controlled Data Sharing**: Granular permissions for sharing portfolio and identity data
+- **Portfolio Tracking**: View DOT balance, staking info, and transaction history
+- **Polkadot Network Stats**: Live DOT price, market cap, staking rate, and validator count
+- **Flex & Level Up**: Gamification system with XP, levels, and ranks (Shrimp to Whale)
+- **Social Sharing**: Share your DOT holdings on Twitter
+- **Fun Games**: Coin flip and dice roll games with win streaks
+- **Account Insights**: Detailed breakdown of liquid, staked, and locked balances
 
 ## Technology Stack
 
 - **Frontend**: React + TypeScript + Vite
 - **Polkadot Integration**: @polkadot/api, @polkadot/extension-dapp
-- **Identity**: Polkadot Identity Pallet
-- **Cross-Chain**: XCM (Cross-Consensus Message Format)
-- **Privacy**: Zero-Knowledge Proofs (zk-SNARKs)
-- **Storage**: IPFS for decentralized data storage
-- **Blockchain**: Substrate-based runtime
+- **Data**: Subscan API, CoinGecko API
+- **Blockchain**: Polkadot mainnet
 
 ## Project Structure
 
 ```
-polkadot/
+polkadot-copy/
 ├── frontend/          # React frontend application
-├── services/          # Backend services and APIs
-├── contracts/         # Smart contracts (if needed)
+├── services/          # Backend services (optional)
 ├── libs/              # Shared libraries and utilities
-├── docs/              # Documentation
-└── scripts/           # Utility scripts
+└── docs/              # Documentation
 ```
 
 ## Setup Instructions
@@ -83,12 +81,11 @@ IPFS_API_URL=https://ipfs.infura.io:5001
 
 ## Usage
 
-1. **Connect Wallet**: Use Polkadot.js extension to connect your wallet
-2. **Set Up Identity**: Register and manage your on-chain identity
-3. **Add Accounts**: Connect accounts from different parachains
-4. **View Portfolio**: See aggregated portfolio across all connected chains
-5. **Manage Credentials**: Create and share verifiable credentials
-6. **Privacy Controls**: Configure data sharing permissions
+1. **Connect Wallet**: Use Polkadot.js extension or enter address manually
+2. **View Portfolio**: See your DOT balance, staking info, and transaction history
+3. **Flex Your DOT**: Level up by flexing your holdings and sharing on Twitter
+4. **Play Games**: Try coin flip and dice roll games with win streaks
+5. **Track Progress**: Monitor your flex level, XP, and rank (Shrimp to Whale)
 
 ## Dependencies
 
@@ -102,7 +99,12 @@ Please follow the workflow outlined in `workflow.md`.
 
 MIT
 
-## Hackathon Submission
+## What We Built
 
-This project is submitted for the "Build Resilient Apps with Polkadot Cloud" hackathon under the **User-centric Apps** theme.
+- Portfolio tracker for Polkadot with real-time balance and staking data
+- Polkadot network stats dashboard (price, market cap, staking rate)
+- Gamification system with levels, XP, ranks, and social sharing
+- Fun browser-based games (coin flip, dice roll) with streaks
+- Clean, responsive UI with Polkadot branding throughout
+- Mobile-friendly design
 

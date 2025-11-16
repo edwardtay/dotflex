@@ -33,12 +33,6 @@
 - User-controlled data sharing permissions
 - Decentralized storage via IPFS (planned)
 
-## Cross-Chain Support
-
-- Current: Single chain (Polkadot/Westend)
-- Future: XCM for cross-chain asset tracking
-- Parachain integration via multi-chain queries
-
 ## Security Considerations
 
 - All transactions require user signature via Polkadot.js extension

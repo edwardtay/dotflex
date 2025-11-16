@@ -11,7 +11,7 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 3000,
+    port: 3001,
     host: true
   },
   build: {
@@ -29,9 +29,12 @@ export default defineConfig({
     include: [
       'bn.js',
       '@polkadot/api',
+      '@polkadot/api-contract',
       '@polkadot/util',
-      '@polkadot/util-crypto'
-    ]
+      '@polkadot/util-crypto',
+      'snarkjs'
+    ],
+    exclude: []
   },
   define: {
     global: 'globalThis'

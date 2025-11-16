@@ -1,0 +1,71 @@
+.staking-calculator {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.staking-calculator h3 {
+  margin: 0 0 1.5rem 0;
+  color: #e6007a;
+  font-size: 1.3rem;
+}
+
+.calc-input {
+  margin-bottom: 1.5rem;
+}
+
+.calc-input label {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.calc-input input {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+}
+
+.calc-input input:focus {
+  outline: none;
+  border-color: #e6007a;
+}
+
+.calc-results {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.calc-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.calc-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.calc-value {
+  color: #e6007a;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.calc-note {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  font-style: italic;
+}
