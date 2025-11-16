@@ -37,6 +37,58 @@
   background-color: rgba(10, 10, 10, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+    order: 3;
+  }
+
+  .nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    order: 4;
+    margin-top: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .nav-links.mobile-open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 0.75rem 1rem;
+    width: 100%;
+  }
+
+  .nav-wallet {
+    order: 2;
+  }
+
+  .nav-brand {
+    order: 1;
+  }
 }
 
 .nav-brand {
@@ -311,6 +363,12 @@
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .main-content {
+    padding: 2rem 1rem;
+  }
+}
+
 .home {
   text-align: center;
 }
@@ -366,6 +424,27 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
   margin-top: 4rem;
+}
+
+@media (max-width: 768px) {
+  .features {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
+  }
+
+  .home h2 {
+    font-size: 2rem;
+  }
+
+  .flex-hero-image {
+    width: 150px;
+    height: 150px;
+  }
 }
 
 .feature-card {

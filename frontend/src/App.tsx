@@ -25,6 +25,7 @@ function AppContent() {
     disconnectEVM 
   } = useWallets()
   const [showWalletMenu, setShowWalletMenu] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const walletMenuRef = useRef<HTMLDivElement>(null)
 
 
@@ -74,10 +75,13 @@ function AppContent() {
               <h1>DotFlex</h1>
             </Link>
           </div>
-          <div className="nav-links">
-            <Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link>
-            <Link to="/cloud" className={location.pathname === '/cloud' ? 'active' : ''}>Polkadot Cloud</Link>
-            <Link to="/play" className={location.pathname === '/play' ? 'active' : ''}>Play</Link>
+          <button className="mobile-menu-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
+          <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+            <Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>Portfolio</Link>
+            <Link to="/cloud" className={location.pathname === '/cloud' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>Polkadot Cloud</Link>
+            <Link to="/play" className={location.pathname === '/play' ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>Play</Link>
           </div>
           <div className="nav-wallet">
             {(polkadot.isConnected && !polkadot.isManualMode) ? (
