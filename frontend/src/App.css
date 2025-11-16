@@ -62,19 +62,25 @@
   }
 
   .nav-links {
-    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     width: 100%;
     flex-direction: column;
     gap: 0;
-    order: 4;
-    margin-top: 1rem;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
+    background: rgba(10, 10, 10, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0.5rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
   }
 
   .nav-links.mobile-open {
-    display: flex;
+    max-height: 300px;
+    opacity: 1;
   }
 
   .nav-links a {
