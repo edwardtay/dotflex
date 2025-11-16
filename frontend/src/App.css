@@ -69,7 +69,8 @@
     width: 100%;
     flex-direction: column;
     gap: 0;
-    background: rgba(10, 10, 10, 0.98);
+    background: rgb(10, 10, 10);
+    backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0.5rem;
     max-height: 0;
